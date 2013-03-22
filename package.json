@@ -1,6 +1,6 @@
 {
   "name": "fleet-ps-json",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Tranform the output of fleet-ps into json",
   "main": "index.js",
   "directories": {
