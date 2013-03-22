@@ -2,7 +2,6 @@
  * Get PIDs of all running fleet processes
  */
 var _ = require('underscore')
-var exec = require('child_process').exec;
 module.exports = function (text) {
   var pattern = /^(drone#[\s\S]*?)^(?:drone|$)/mg;
   var drones = text.match(pattern)
