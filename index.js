@@ -1,35 +1,41 @@
 /**
  * Get PIDs of all running fleet processes
  */
-var inspect = require('eyespect').inspector()
+var _ = require('underscore')
 var exec = require('child_process').exec;
-module.exports = function (cb) {
-
-  // get the output of fleet-ps
-  var cmd = 'fleet-ps'
-  var child = exec(cmd, function(err, stdout, stderr) {
-    if (err) {
-      return cb({
-        message: 'failed to get list of fleet pids',
-        error: err,
-        stack: new Error().stack
-      })
-    }
-    if (stderr) {
-      return cb({
-        message: 'failed to get list of fleet pids',
-        error: stderr,
-        stack: new Error().stack
-      })
-    }
-    var drones = splitByDrone(stdout)
-    cb(null, pids)
-  });
+module.exports = function (text) {
+  var pattern = /^(drone#[\s\S]*?)^(?:drone|$)/mg;
+  var drones = text.match(pattern)
+  var drone = drones[0]
+  var result = drones.map(function (droneText) {
+    var droneName = droneText.match(/^drone#(.*?)\n/)[1]
+    var pidElements = splitByPID(droneText).map(function (element) {
+      element.drone = droneName
+      return element
+    })
+    return pidElements
+  })
+  var output = _.flatten(result);
+  return output
 }
 
-
-function splitByDrone(text) {
-  var pattern = /^(drone#[\s\S]*?)^(?:drone|$)/mg
-  var drones = text.match(pattern)
-  return drones
+function splitByPID(text) {
+  var pattern = /pid#/;
+  var dronePattern = /^drone/
+    var lines = text.split(pattern).filter(function (line) {
+      return !dronePattern.test(line)
+    })
+  var results = lines.map(function (line) {
+    var pid = line.match(/^(.*?)\n/)[1]
+    var commitMatch = line.match(/commit:\s+(.*?)\n/);
+    var commit = commitMatch[1]
+    var command = line.match(/command:\s+(.*?)\n/)[1];
+    var output = {
+      pid: pid,
+      commit: commit,
+      command: command
+    }
+    return output
+  })
+  return results
 }
